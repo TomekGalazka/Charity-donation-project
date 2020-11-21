@@ -1,4 +1,4 @@
-from django.contrib.auth import authenticate, login
+from django.contrib.auth import authenticate, login, logout
 from django.shortcuts import render, redirect
 from django.urls import reverse_lazy
 from django.views import View
@@ -41,4 +41,10 @@ class LoginView(FormView):
 
     def get_success_url(self):
         return self.request.GET.get('next', reverse_lazy('landing_page'))
+
+
+class LogoutView(View):
+    def get(self, request, *args, **kwargs):
+        logout(request)
+        return redirect(reverse_lazy('landing_page'))
 
