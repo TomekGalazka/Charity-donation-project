@@ -1,4 +1,5 @@
 from django import forms
+from django.contrib.auth import authenticate
 from django.core.exceptions import ValidationError
 
 from .models import User
@@ -41,3 +42,22 @@ class RegisterUserForm(forms.Form):
         if '@' and '.' not in email:
             raise ValidationError('Please provide a valid e-mail address.')
 
+
+class LoginUserForm(forms.Form):
+    email = forms.CharField(widget=forms.EmailInput(attrs={'placeholder': 'Email'}), label='Email')
+    password = forms.CharField(widget=forms.PasswordInput(attrs={'placeholder': 'Hasło'}), label='Hasło')
+
+    email.widget.attrs.update({'class': 'form-group form-group--buttons'})
+    password.widget.attrs.update({'class': 'form-group form-group--buttons'})
+
+    # def clean(self):
+    #     """
+    #     Overwrite clean method to check if there are any errors.
+    #     :return: ValidationError, if user is not authenticated.
+    #     """
+    #     cleaned_data = super().clean()
+    #     email = cleaned_data['email']
+    #     password = cleaned_data['password']
+    #
+    #     if authenticate(email=email, password=password) is None:
+    #         raise ValidationError('Your email or password is incorrect.')
