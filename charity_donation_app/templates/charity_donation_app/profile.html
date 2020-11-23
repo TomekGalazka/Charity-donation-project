@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block header %}
+    <header class="header--main-page">
+{% endblock %}
+
+{% block slogan %}
+        <div class="slogan container container--90">
+            <div class="slogan--item">
+              <h2>
+                  Twój profil:
+              </h2>
+                {% if request.user.is_authenticated %}
+                    <h1>
+                        {{ request.user.first_name}} {{ request.user.last_name }}<br>
+                        {{ request.user.email}}
+                    </h1>
+
+                {% endif %}
+            </div>
+        </div>
+{% endblock %}
+
+{% block body %}
+<section id="steps" class="steps">
+      <h2>Twoje dary</h2>
+{% for donation in user_donations %}
+      <div class="steps--container">
+        <div class="steps--item">
+            <h3>Wsparta organizacja: {{ donation.institution.name}}</h3>
+            <p>Ilość przekazanych worków: {{ donation.quantity }}</p>
+            <p>Wybrane kategorie:
+                {% for value in donation.categories.all %}
+                    {{ value }},
+                {% endfor %}
+            </p>
+            <p>Data odbioru: {{ donation.pick_up_date }}</p>
+            <p>Czas odbioru: {{ donation.pick_up_time }}</p>
+        </div>
+      </div>
+</section>
+{% endfor %}<br><br>
+{% endblock %}

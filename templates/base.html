@@ -17,10 +17,14 @@
         <ul class="nav--actions">
             {% if request.user.is_authenticated %}
                 <li class="logged-user">
-                    Zalogowany użytkownik: {{ request.user.email }}
+                    Witaj {{ request.user.email }}
                     <ul class="dropdown">
                         <li><a href="#">Profil</a></li>
                         <li><a href="#">Ustawienia</a></li>
+                        {% if request.user.is_superuser %}
+                            <li><a href="/admin/">Panel administracyjny</a></li>
+                        {% endif %}
+                        <li><a href="{% url 'charity_donation_app:user-profile' %}">Profil</a></li>
                         <li><a href="{% url 'auth_ex:logout' %}">Wyloguj</a></li>
                     </ul>
                 </li>
@@ -87,7 +91,11 @@
         </footer>
 
     {% endblock %}
+    {% block additional_js %}
+    {% endblock %}
     {% block js %}
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+        <script src="https://code.jquery.com/jquery-3.1.0.min.js"></script>
         <script src="{% static 'js/app.js' %}"></script>
     {% endblock %}
 </body>
