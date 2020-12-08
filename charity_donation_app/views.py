@@ -50,65 +50,53 @@ class AddDonationView(LoginRequiredMixin, View):
         return render(request, 'charity_donation_app/form.html', ctx)
 
     def post(self, request, *args, **kwargs):
-        quantity = self.request.POST.get('bags', None)
-        categories = self.request.POST.get_list('categories', None)
-        institution = self.request.POST.get('organization', None)
-        address = self.request.POST.get('address', None)
-        phone_number = self.request.POST.get('phone_number', None)
-        city = self.request.POST.get('city', None)
-        zip_code = self.request.POST.get('postcode', None)
-        pick_up_date = self.request.POST.get('date', None)
-        pick_up_time = self.request.POST.get('time', None)
-        pick_up_comment = self.request.POST.get('more_info', None)
+        # form = DonationForm(request.POST)
+        # if form.is_valid():
+
+        categories_string = request.POST.get('categories')
+        quantity = request.POST.get('bags', None)
+        organization_id = request.POST.get('organization', None)
+        city = request.POST.get('city', None)
+        address = request.POST.get('address', None)
+        phone = request.POST.get('phone')
+        date = request.POST.get('date', None)
+        time = request.POST.get('time', None)
+        more_info = request.POST.get('more_info', None)
+        post_code = request.POST.get('postcode', None)
+
+        split_categories_string = categories_string.split(", ")
+
+        categories_ids = [int(category_id) for category_id in split_categories_string]
+
+        organization = Institution.objects.get(pk=organization_id)
+        categories = Category.objects.filter(pk__in=categories_ids)
 
         user = request.user
 
         add_donation = Donation.objects.create(
             quantity=quantity,
-            categories=categories,
-            institution=institution,
+            institution=organization,
             address=address,
             city=city,
-            phone_number=phone_number,
-            zip_code=zip_code,
-            pick_up_date=pick_up_date,
-            pick_up_time=pick_up_time,
-            pick_up_comment=pick_up_comment,
+            phone_number=phone,
+            zip_code=post_code,
+            pick_up_date=date,
+            pick_up_time=time,
+            pick_up_comment=more_info,
             user=user
         )
-        add_donation.user.add(user)
-        return redirect(reverse_lazy('charity_donation_app:form_confirmation'))
+        for category in categories:
+            add_donation.categories.add(category)
+
+        data = {'mission_completed': 'udalo się'}
+        response = JsonResponse(data)
+        return response
 
 
 class FormConfirmationView(View):
 
     def get(self, request, *args, **kwargs):
-        return render(request, 'charity_donation_app/form_confirmation.html')
-
-
-def donation_choices(request, *args, **kwargs):
-    if request.method == 'GET':
-        bags = request.GET.get('bags', None)
-        organization_id = request.GET.get('organization', None)
-        city = request.GET.get('city', None)
-        postcode = request.GET.get('postcode', None)
-        date = request.GET.get('date', None)
-        time = request.GET.get('time', None)
-        more_info = request.GET.get('more_info', None)
-
-        organization = Institution.objects.get(pk=organization_id)
-
-        data = {
-            'worki': bags,
-            'organizacja': organization.name,
-            'miasto': city,
-            'kod_pocztowy': postcode,
-            'twoja_data': date,
-            'czas': time,
-            'informacje': more_info
-        }
-        response = JsonResponse(data)
-        return response
+        return render(request, 'charity_donation_app/form-confirmation.html')
 
 
 class UserView(View):

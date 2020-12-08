@@ -1,6 +1,10 @@
 {% extends 'base.html' %}
 {% load static %}
 {% block header %}
+    <script>
+        data = for templates:
+        { 1: [instytucje_id]}
+    </script>
     <header class="header--main-page">
 {% endblock %}
 
@@ -56,7 +60,7 @@
       <div class="form--steps-container">
         <div class="form--steps-counter">Krok <span>1</span>/5</div>
 
-        <form action="" method="post">
+        <form action="" method="post" id="donation-form">
             {% csrf_token %}
           <!-- STEP 1: class .active is switching steps -->
           <div data-step="1" class="active">
@@ -75,19 +79,22 @@
 {#                >#}
 {#              </label>#}
 {#            </div>#}
-            {% for category in categories %}
+
                 <div class="form-group form-group--checkbox">
+                {% for category in categories %}
                   <label>
                     <input
                       type="checkbox"
                       name="categories"
                       value="{{ category.pk }}"
+                      class="multiple_checkbox_input"
                     />
                     <span class="checkbox"></span>
                     <span class="description">{{ category.name }}</span>
                   </label>
+                {% endfor %}
                 </div>
-            {% endfor %}
+
 {#            <div class="form-group form-group--checkbox">#}
 {#              <label>#}
 {#                <input type="checkbox" name="categories" value="toys" />#}
@@ -113,7 +120,7 @@
 {#            </div>#}
 
             <div class="form-group form-group--buttons">
-              <button type="button" class="btn next-step">Dalej</button>
+              <button type="button" class="btn next-step" id="first_button">Dalej</button>
             </div>
           </div>
 
@@ -130,7 +137,7 @@
 
             <div class="form-group form-group--buttons">
               <button type="button" class="btn prev-step">Wstecz</button>
-              <button type="button" class="btn next-step">Dalej</button>
+              <button type="button" class="btn next-step" id="second_button">Dalej</button>
             </div>
           </div>
 
@@ -142,10 +149,10 @@
             {% for institution in institutions %}
                 <div class="form-group form-group--checkbox">
                   <label>
-                    <input type="radio" name="organization" value="{{ institution.pk }}" />
+                    <input type="radio" name="organization" id="chosen_organization" value="{{ institution.pk }}" />
                     <span class="checkbox radio"></span>
                     <span class="description">
-                      <div class="title">{{ institution.name }}</div>
+                      <div class="title" id="organization_name">{{ institution.name }}</div>
                       <div class="subtitle">
                         {{ institution.description }}
                       </div>
@@ -169,7 +176,7 @@
 
             <div class="form-group form-group--buttons">
               <button type="button" class="btn prev-step">Wstecz</button>
-              <button type="button" class="btn next-step">Dalej</button>
+              <button type="button" class="btn next-step" id="third_button">Dalej</button>
             </div>
           </div>
 
@@ -215,14 +222,14 @@
                 <div class="form-group form-group--inline">
                   <label>
                     Uwagi dla kuriera
-                    <textarea name="more_info" rows="5" ></textarea>
+                      <textarea type="text" id="pick_up_comment" name="more_info"></textarea>
                   </label>
                 </div>
               </div>
             </div>
             <div class="form-group form-group--buttons">
               <button type="button" class="btn prev-step">Wstecz</button>
-              <button type="button" id="js-summarize" class="btn next-step">Dalej</button>
+              <button type="button" class="btn next-step" id="fourth_button">Dalej</button>
             </div>
           </div>
 
@@ -237,14 +244,14 @@
                   <li>
                     <span class="icon icon-bag"></span>
                     <span id='bags' class="summary--text"
-                      > worki</span
+                      > Ilość przekazanych worków: </span
                     >
                   </li>
 
                   <li>
                     <span class="icon icon-hand"></span>
                     <span class="summary--text" id="organization"
-                      >Dla fundacji</span
+                      >Dla fundacji: </span
                     >
                   </li>
                 </ul>
@@ -266,7 +273,7 @@
                   <ul>
                     <li id="date"></li>
                     <li id="time"></li>
-                    <li id="more_info"></li>
+                    <li id="pick_up_comment"></li>
                   </ul>
                 </div>
               </div>
@@ -323,7 +330,7 @@
 
             <div class="form-group form-group--buttons">
               <button type="button" class="btn prev-step">Wstecz</button>
-              <button type="submit" class="btn">Potwierdzam</button>
+              <button type="submit" id="js-summarize" class="btn">Potwierdzam</button>
             </div>
           </div>
         </form>
@@ -331,52 +338,52 @@
     </section>
 {% endblock %}
 
-{% block additional_js %}
-    <script>
-        $( document ).ready(function() {
-            $("#js-summarize").on('click', function () {
-              let bags = $("input[name='bags']").val();
-              let organization = $("input[name='organization']").val();
-              let address = $("input[name='address']").val();
-              let city = $("input[name='city']").val();
-              let postcode = $("input[name='postcode']").val();
-              let date = $("input[name='date']").val();
-              let time = $("input[name='time']").val();
-              let more_info = $("input[name='more_info']").val();
-              $.ajax({
-                url: "{% url 'charity_donation_app:donation_choices' %}",
-                type: 'get',
-                data: {
-                    'bags': bags,
-                    'organization': organization,
-                    'address': address,
-                    'city': city,
-                    'postcode': postcode,
-                    'date': date,
-                    'time': time,
-                    'more_info': more_info
-                },
+{#{% block additional_js %}#}
+{#    <script>#}
+{#        $( document ).ready(function() {#}
+{#            $("#js-summarize").on('click', function () {#}
+{#              let bags = $("input[name='bags']").val();#}
+{#              let organization = $("input[name='organization']").val();#}
+{#              let address = $("input[name='address']").val();#}
+{#              let city = $("input[name='city']").val();#}
+{#              let postcode = $("input[name='postcode']").val();#}
+{#              let date = $("input[name='date']").val();#}
+{#              let time = $("input[name='time']").val();#}
+{#              let more_info = $("input[name='more_info']").val();#}
+{#              $.ajax({#}
+{#                url: "{% url 'charity_donation_app:donation_choices' %}",#}
+{#                type: 'post',#}
+{#                data: {#}
+{#                    'bags': bags,#}
+{#                    'organization': organization,#}
+{#                    'address': address,#}
+{#                    'city': city,#}
+{#                    'postcode': postcode,#}
+{#                    'date': date,#}
+{#                    'time': time,#}
+{#                    'more_info': more_info#}
+{#                },#}
                 {#dataType: 'json',#}
-                success: function (response) {
-                    alert("Dziękujemy, aktualizujemy Twoje wybory.");
-                    let given_bags = document.getElementById('bags');
-                    given_bags.innerHTML = response.content['worki'] + given_bags.innerHTML;
-                    let chosen_organization = document.getElementById('organization');
-                    chosen_organization.innerHTML = response.content['organizacja'] + chosen_organization.innerHTML;
-                    let chosen_city= document.getElementById('city');
-                    chosen_city.innerHTML = response.content['miasto'] + chosen_city.innerHTML;
-                    let chosen_postcode = document.getElementById('postcode');
-                    chosen_postcode.innerHTML = response.content['kod_pocztowy'] + chosen_postcode.innerHTML;
-                    let chosen_date = document.getElementById('date');
-                    chosen_date.innerHTML = response.content['twoja_data'] + chosen_date.innerHTML;
-                    let chosen_time = document.getElementById('time');
-                    chosen_time.innerHTML = response.content['czas'] + chosen_time.innerHTML;
-                    let provided_informations = document.getElementById('more_info');
-                    provided_informations.innerHTML = response.content['informacje'] + provided_informations.innerHTML;
-                }
-              });
-
-            });
-        });
-    </script>
-{% endblock %}
+{#                success: function (response) {#}
+{#                    alert("Dziękujemy, aktualizujemy Twoje wybory.");#}
+{#                    let given_bags = document.getElementById('bags');#}
+{#                    given_bags.innerHTML = response.content['worki'] + given_bags.innerHTML;#}
+{#                    let chosen_organization = document.getElementById('organization');#}
+{#                    chosen_organization.innerHTML = response.content['organizacja'] + chosen_organization.innerHTML;#}
+{#                    let chosen_city= document.getElementById('city');#}
+{#                    chosen_city.innerHTML = response.content['miasto'] + chosen_city.innerHTML;#}
+{#                    let chosen_postcode = document.getElementById('postcode');#}
+{#                    chosen_postcode.innerHTML = response.content['kod_pocztowy'] + chosen_postcode.innerHTML;#}
+{#                    let chosen_date = document.getElementById('date');#}
+{#                    chosen_date.innerHTML = response.content['twoja_data'] + chosen_date.innerHTML;#}
+{#                    let chosen_time = document.getElementById('time');#}
+{#                    chosen_time.innerHTML = response.content['czas'] + chosen_time.innerHTML;#}
+{#                    let provided_informations = document.getElementById('more_info');#}
+{#                    provided_informations.innerHTML = response.content['informacje'] + provided_informations.innerHTML;#}
+{#                }#}
+{#              });#}
+{##}
+{#            });#}
+{#        });#}
+{#    </script>#}
+{#{% endblock %}#}

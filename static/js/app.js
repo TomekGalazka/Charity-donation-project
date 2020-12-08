@@ -235,7 +235,10 @@ document.addEventListener("DOMContentLoaded", function() {
       this.$step.parentElement.hidden = this.currentStep >= 6;
 
       // TODO: get data from inputs and show them in summary
+
     }
+
+
 
     /**
      * Submit form
@@ -245,11 +248,123 @@ document.addEventListener("DOMContentLoaded", function() {
     submit(e) {
       e.preventDefault();
       this.currentStep++;
+      function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                // Does this cookie string begin with the name we want?
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+      }
+      const csrftoken = getCookie('csrftoken');
+      let user = '{{  }}'
+
+      let all_checkbox_input_id = document.querySelectorAll('input[class="multiple_checkbox_input"]:checked');
+
+      let checkbox_list_values = [];
+
+      for(let x = 0, l = all_checkbox_input_id.length; x < l;  x++)
+      {
+          checkbox_list_values.push(all_checkbox_input_id[x].value);
+      }
+
+      let checkbox_string_values = checkbox_list_values.join(', ');
+      // let final_checkbox_list = Array.of(checkbox_list_values);
+      console.log(checkbox_string_values);
       this.updateForm();
+              let bags = $("input[name='bags']").val();
+              // let organization = $("input[name='organization']").val();
+              let organization = $("input[name='organization']:checked").val();
+              let address = $("input[name='address']").val();
+              let city = $("input[name='city']").val();
+              let postcode = $("input[name='postcode']").val();
+              let date = $("input[name='date']").val();
+              let time = $("input[name='time']").val();
+              let more_info = $("textarea#pick_up_comment").val();
+              // let categories = $("input[name='categories']:checked")
+              //   .map(() => { return this.value }).get()
+              let categories = checkbox_string_values
+              let phone = $("input[name='phone']").val();
+              // let csrf_token = $("input[name='csrfmiddlewaretoken']").val();
+
+              $.ajax({
+                url: '/charity_donation/add_donation/',
+                type: 'post',
+                data: {
+                    'categories': categories,
+                    'bags': bags,
+                    'organization': organization,
+                    'address': address,
+                    'city': city,
+                    'postcode': postcode,
+                    'date': date,
+                    'time': time,
+                    'more_info': more_info,
+                    'csrfmiddlewaretoken': csrftoken,
+                    'phone': phone,
+                    'credentials': 'include',
+                },
+                success: function (response) {
+                    alert("Dziękujemy, twoja darowizna została zarejestrowana!");
+                    window.location.replace('/charity_donation/form_confirmation');
+                }
+              });
+
     }
   }
   const form = document.querySelector(".form--steps");
   if (form !== null) {
     new FormSteps(form);
   }
+
+
+
+  let second_button = document.getElementById("second_button");
+  let third_button = document.getElementById("third_button");
+  let fourth_button = document.getElementById("fourth_button");
+
+  second_button.addEventListener('click', function () {
+    let bags = $("input[name='bags']").val();
+    let given_bags = document.querySelector('#bags');
+    given_bags.textContent = given_bags.textContent + bags;
+  })
+  third_button.addEventListener('click', function () {
+    // let organization = $("input[name='organization']:checked").text()
+    let organization = $("input[name='organization']:checked").nextSibling.nextSibling.firstChild
+    // let organization = document.getElementById('organization_name')
+    let given_organization = document.querySelector('#organization');
+    given_organization.textContent = given_organization.textContent + organization.textContent;
+  })
+  fourth_button.addEventListener('click', function () {
+    let address = $("input[name='address']").val();
+    let city = $("input[name='city']").val();
+    let postcode = $("input[name='postcode']").val();
+    let date = $("input[name='date']").val();
+    let time = $("input[name='time']").val();
+    let phone = $("input[name='phone']").val();
+    let more_info = $("input[name='pick_up_comment']").val();
+
+    let given_address = document.querySelector('#address');
+    let given_city = document.querySelector('#city');
+    let given_postcode = document.querySelector('#postcode');
+    let given_phone = document.querySelector('#phone');
+    let given_date = document.querySelector('#date');
+    let given_time = document.querySelector('#time');
+    let given_more_info = document.querySelector('#pick_up_comment');
+
+    given_address.textContent = address;
+    given_city.textContent = city;
+    given_postcode.textContent = postcode;
+    given_phone.textContent = phone;
+    given_date.textContent = date;
+    given_time.textContent = time;
+    given_more_info.textContent = more_info;
+  })
 });

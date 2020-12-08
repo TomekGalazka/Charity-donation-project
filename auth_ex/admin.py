@@ -11,14 +11,14 @@ class CategoryAdmin(admin.ModelAdmin):
 
 @admin.register(Institution)
 class InstitutionAdmin(admin.ModelAdmin):
-    list_display = ("name", "description", "type")
+    list_display = ("id", "name", "description", "type")
 
 
 @admin.register(Donation)
 class DonationAdmin(admin.ModelAdmin):
     list_display = (
         "quantity", "address", "phone_number", "city", "zip_code", "pick_up_date",
-        "pick_up_time", "pick_up_comment", "user"
+        "pick_up_time", "pick_up_comment", "institution", "user"
     )
 
 
