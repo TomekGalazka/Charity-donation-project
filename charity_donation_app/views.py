@@ -4,6 +4,7 @@ from django.shortcuts import render, redirect
 from django.urls import reverse_lazy, reverse
 from django.views import View
 
+from . forms import DonationForm
 from . models import Donation, Institution, Category
 
 
@@ -50,47 +51,48 @@ class AddDonationView(LoginRequiredMixin, View):
         return render(request, 'charity_donation_app/form.html', ctx)
 
     def post(self, request, *args, **kwargs):
-        # form = DonationForm(request.POST)
-        # if form.is_valid():
+        form = DonationForm(request.POST)
+        if form.is_valid():
+            categories_string = form.cleaned_data.get('categories', None)
+            quantity = form.cleaned_data.get('bags', None)
+            organization_id = form.cleaned_data.get('organization', None)
+            city = form.cleaned_data.get('city', None)
+            address = form.cleaned_data.get('address', None)
+            phone = form.cleaned_data.get('phone')
+            date = form.cleaned_data.get('date', None)
+            time = form.cleaned_data.get('time', None)
+            more_info = form.cleaned_data.get('more_info', None)
+            post_code = form.cleaned_data.get('postcode', None)
 
-        categories_string = request.POST.get('categories')
-        quantity = request.POST.get('bags', None)
-        organization_id = request.POST.get('organization', None)
-        city = request.POST.get('city', None)
-        address = request.POST.get('address', None)
-        phone = request.POST.get('phone')
-        date = request.POST.get('date', None)
-        time = request.POST.get('time', None)
-        more_info = request.POST.get('more_info', None)
-        post_code = request.POST.get('postcode', None)
+            split_categories_string = categories_string.split(", ")
 
-        split_categories_string = categories_string.split(", ")
+            categories_ids = [int(category_id) for category_id in split_categories_string]
 
-        categories_ids = [int(category_id) for category_id in split_categories_string]
+            organization = Institution.objects.get(pk=organization_id)
+            categories = Category.objects.filter(pk__in=categories_ids)
 
-        organization = Institution.objects.get(pk=organization_id)
-        categories = Category.objects.filter(pk__in=categories_ids)
+            user = request.user
 
-        user = request.user
+            add_donation = Donation.objects.create(
+                quantity=quantity,
+                institution=organization,
+                address=address,
+                city=city,
+                phone_number=phone,
+                zip_code=post_code,
+                pick_up_date=date,
+                pick_up_time=time,
+                pick_up_comment=more_info,
+                user=user
+            )
+            for category in categories:
+                add_donation.categories.add(category)
 
-        add_donation = Donation.objects.create(
-            quantity=quantity,
-            institution=organization,
-            address=address,
-            city=city,
-            phone_number=phone,
-            zip_code=post_code,
-            pick_up_date=date,
-            pick_up_time=time,
-            pick_up_comment=more_info,
-            user=user
-        )
-        for category in categories:
-            add_donation.categories.add(category)
-
-        data = {'mission_completed': 'udalo się'}
-        response = JsonResponse(data)
-        return response
+            data = {'mission_completed': 'All is ok!'}
+            response = JsonResponse(data)
+            return response
+        data = {'abort': 'Something went wrong with your form.'}
+        return JsonResponse(data)
 
 
 class FormConfirmationView(View):
