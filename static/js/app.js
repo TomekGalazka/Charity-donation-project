@@ -299,24 +299,26 @@ document.addEventListener("DOMContentLoaded", function() {
                 type: 'post',
                 data: {
                     'categories': categories,
-                    'bags': bags,
-                    'organization': organization,
+                    'quantity': bags,
+                    'institution': organization,
                     'address': address,
                     'city': city,
-                    'postcode': postcode,
-                    'date': date,
-                    'time': time,
-                    'more_info': more_info,
+                    'zip_code': postcode,
+                    'pick_up_date': date,
+                    'pick_up_time': time,
+                    'pick_up_comment': more_info,
                     'csrfmiddlewaretoken': csrftoken,
-                    'phone': phone,
+                    'phone_number': phone,
                     'credentials': 'include',
                 },
-                success: function (response) {
+                success: function (data) {
                     alert("Dziękujemy, twoja darowizna została zarejestrowana!");
                     window.location.replace('/charity_donation/form_confirmation');
-                }
+                },
+                error : function(xhr,errmsg,err) {
+                    alert(xhr.status + ": " + xhr.responseText);
+    }
               });
-
     }
   }
   const form = document.querySelector(".form--steps");
@@ -336,11 +338,29 @@ document.addEventListener("DOMContentLoaded", function() {
     given_bags.textContent = given_bags.textContent + bags;
   })
   third_button.addEventListener('click', function () {
-    // let organization = $("input[name='organization']:checked").text()
-    let organization = $("input[name='organization']:checked").nextSibling.nextSibling.firstChild
+    let organization_pk = $("input[name='organization']:checked").val()
+    // let organization = $("input[name='organization']:checked").nextSibling.nextSibling.firstChild
     // let organization = document.getElementById('organization_name')
-    let given_organization = document.querySelector('#organization');
-    given_organization.textContent = given_organization.textContent + organization.textContent;
+    let inst_csrftoken = $("input[name='csrfmiddlewaretoken']").val();
+              $.ajax({
+                url: '/charity_donation/add_donation/',
+                type: 'post',
+                data: {
+                    'organization_pk': organization_pk,
+                    'csrfmiddlewaretoken': inst_csrftoken,
+                },
+                success: function (org_response) {
+                    alert("Zaznaczono organizację");
+                    let organization = org_response['organization']
+                    let given_organization = document.querySelector('#organization');
+                    given_organization.textContent = given_organization.textContent + organization
+                },
+                error : function(xhr,errmsg,err) {
+                    alert(xhr.status + ": " + xhr.responseText);
+                },
+              });
+    // let given_organization = document.querySelector('#organization');
+    // given_organization.textContent = given_organization.textContent + organization
   })
   fourth_button.addEventListener('click', function () {
     let address = $("input[name='address']").val();

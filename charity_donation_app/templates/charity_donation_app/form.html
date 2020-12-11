@@ -1,10 +1,10 @@
 {% extends 'base.html' %}
 {% load static %}
 {% block header %}
-    <script>
-        data = for templates:
-        { 1: [instytucje_id]}
-    </script>
+{#    <script>#}
+{#        data = for templates:#}
+{#        { 1: [instytucje_id]}#}
+{#    </script>#}
     <header class="header--main-page">
 {% endblock %}
 
@@ -37,7 +37,7 @@
       </div>
 {% endblock %}
 {% block body %}
-    <section class="form--steps">
+    <section id="main_form" class="form--steps">
       <div class="form--steps-instructions">
         <div class="form--steps-container">
           <h3>Ważne!</h3>
@@ -79,9 +79,8 @@
 {#                >#}
 {#              </label>#}
 {#            </div>#}
-
-                <div class="form-group form-group--checkbox">
                 {% for category in categories %}
+                <div class="form-group form-group--checkbox">
                   <label>
                     <input
                       type="checkbox"
@@ -92,8 +91,8 @@
                     <span class="checkbox"></span>
                     <span class="description">{{ category.name }}</span>
                   </label>
-                {% endfor %}
                 </div>
+                {% endfor %}
 
 {#            <div class="form-group form-group--checkbox">#}
 {#              <label>#}

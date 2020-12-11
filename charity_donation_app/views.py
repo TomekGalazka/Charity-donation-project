@@ -51,18 +51,28 @@ class AddDonationView(LoginRequiredMixin, View):
         return render(request, 'charity_donation_app/form.html', ctx)
 
     def post(self, request, *args, **kwargs):
+
+        if request.is_ajax():
+            organization_pk = request.POST['organization_pk']
+            organization_queryset = Institution.objects.filter(pk=organization_pk)
+            organization = ""
+            for item in organization_queryset:
+                organization += str(item)
+            org_response = {'organization': organization}
+            return JsonResponse(org_response)
+
         form = DonationForm(request.POST)
         if form.is_valid():
-            categories_string = form.cleaned_data.get('categories', None)
-            quantity = form.cleaned_data.get('bags', None)
-            organization_id = form.cleaned_data.get('organization', None)
-            city = form.cleaned_data.get('city', None)
-            address = form.cleaned_data.get('address', None)
-            phone = form.cleaned_data.get('phone')
-            date = form.cleaned_data.get('date', None)
-            time = form.cleaned_data.get('time', None)
-            more_info = form.cleaned_data.get('more_info', None)
-            post_code = form.cleaned_data.get('postcode', None)
+            categories_string = form.cleaned_data.get('categories')
+            quantity = form.cleaned_data.get('quantity')
+            organization_id = form.cleaned_data.get('institution')
+            city = form.cleaned_data.get('city')
+            address = form.cleaned_data.get('address')
+            phone = form.cleaned_data.get('phone_number')
+            date = form.cleaned_data.get('pick_up_date')
+            time = form.cleaned_data.get('pick_up_time')
+            more_info = form.cleaned_data.get('pick_up_comment')
+            post_code = form.cleaned_data.get('zip_code')
 
             split_categories_string = categories_string.split(", ")
 
@@ -91,8 +101,6 @@ class AddDonationView(LoginRequiredMixin, View):
             data = {'mission_completed': 'All is ok!'}
             response = JsonResponse(data)
             return response
-        data = {'abort': 'Something went wrong with your form.'}
-        return JsonResponse(data)
 
 
 class FormConfirmationView(View):
@@ -108,3 +116,4 @@ class UserView(View):
         user_donations = Donation.objects.filter(user=user)
 
         return render(request, 'charity_donation_app/profile.html', {'user_donations': user_donations})
+
