@@ -479,4 +479,9 @@ document.addEventListener("DOMContentLoaded", function() {
     given_time.textContent = time;
     given_more_info.textContent = more_info;
   })
+  let reset_button = document.getElementById('institution_reset')
+  reset_button.addEventListener('click', function () {
+      let main_div = document.getElementById('main_div')
+      main_div.innerHTML = ""
+  })
 });
