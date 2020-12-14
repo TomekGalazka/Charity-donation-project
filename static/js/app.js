@@ -254,7 +254,6 @@ document.addEventListener("DOMContentLoaded", function() {
             const cookies = document.cookie.split(';');
             for (let i = 0; i < cookies.length; i++) {
                 const cookie = cookies[i].trim();
-                // Does this cookie string begin with the name we want?
                 if (cookie.substring(0, name.length + 1) === (name + '=')) {
                     cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
                     break;
@@ -264,7 +263,6 @@ document.addEventListener("DOMContentLoaded", function() {
         return cookieValue;
       }
       const csrftoken = getCookie('csrftoken');
-      let user = '{{  }}'
 
       let all_checkbox_input_id = document.querySelectorAll('input[class="multiple_checkbox_input"]:checked');
 
@@ -276,11 +274,9 @@ document.addEventListener("DOMContentLoaded", function() {
       }
 
       let checkbox_string_values = checkbox_list_values.join(', ');
-      // let final_checkbox_list = Array.of(checkbox_list_values);
       console.log(checkbox_string_values);
       this.updateForm();
               let bags = $("input[name='bags']").val();
-              // let organization = $("input[name='organization']").val();
               let organization = $("input[name='organization']:checked").val();
               let address = $("input[name='address']").val();
               let city = $("input[name='city']").val();
@@ -288,12 +284,8 @@ document.addEventListener("DOMContentLoaded", function() {
               let date = $("input[name='date']").val();
               let time = $("input[name='time']").val();
               let more_info = $("textarea#pick_up_comment").val();
-              // let categories = $("input[name='categories']:checked")
-              //   .map(() => { return this.value }).get()
               let categories = checkbox_string_values
               let phone = $("input[name='phone']").val();
-              // let csrf_token = $("input[name='csrfmiddlewaretoken']").val();
-
               $.ajax({
                 url: '/charity_donation/add_donation/',
                 type: 'post',
@@ -326,11 +318,115 @@ document.addEventListener("DOMContentLoaded", function() {
     new FormSteps(form);
   }
 
-
-
+  let first_button = document.getElementById("first_button");
   let second_button = document.getElementById("second_button");
   let third_button = document.getElementById("third_button");
   let fourth_button = document.getElementById("fourth_button");
+
+  first_button.addEventListener('click', function () {
+    let checkbox_input_ids = document.querySelectorAll('input[class="multiple_checkbox_input"]:checked');
+    let category_id_list = [];
+
+      for(let x = 0, l = checkbox_input_ids.length; x < l;  x++)
+      {
+          category_id_list.push(checkbox_input_ids[x].value);
+      }
+    // let selected_categories_id = Array.from(all_checkbox_input_id)
+    let cat_csrftoken = $("input[name='csrfmiddlewaretoken']").val();
+    $.ajax({
+                url: '/charity_donation/add_donation/',
+                type: 'post',
+                traditional: true,
+                data: {
+                    'selected_categories_id': category_id_list,
+                    'csrfmiddlewaretoken': cat_csrftoken,
+                },
+                success: function (response) {
+                    alert("Zaznaczono kategorie");
+                    let institutions = response['institutions']
+
+                    for(let i = 0 ; i < institutions.length ; i++){
+                        let main_div = document.getElementById('main_div')
+                        let new_label = document.createElement('label')
+                        let new_input = document.createElement('input')
+                        new_input.setAttribute('type', 'radio')
+                        new_input.setAttribute('name', 'organization')
+                        new_input.setAttribute('id', 'chosen_organization')
+                        new_input.setAttribute('value', institutions[i][0])
+
+                        let first_span = document.createElement('span')
+                        first_span.setAttribute('class', 'checkbox radio')
+
+                        let second_span = document.createElement('span')
+                        second_span.setAttribute('class', 'description')
+
+                        let name_div = document.createElement('div')
+                        name_div.setAttribute('class', 'title')
+                        name_div.setAttribute('id', 'organization_name')
+                        name_div.innerHTML = institutions[i][1]
+
+                        let description_div = document.createElement('div')
+                        description_div.setAttribute('class', 'subtitle')
+                        description_div.setAttribute('id', 'organization_description')
+                        description_div.innerHTML = institutions[i][2]
+
+                        second_span.appendChild(name_div)
+                        second_span.appendChild(description_div)
+
+                        new_label.appendChild(new_input)
+                        new_label.appendChild(first_span)
+                        new_label.appendChild(second_span)
+                        main_div.appendChild(new_label)
+                    }
+
+                    // institutions_inputs.forEach(function(element) {
+                    //     institutions_ids.forEach(function (e){
+                    //         if(Number(e) != element.value) {
+                    //             console.log(element.value)
+                    //             $('#chosen_organization').toggle();
+                    //             $('#checkbox_span').toggle();
+                    //             $('#description_span').toggle();
+                    //             $('#organization_name').toggle();
+                    //             $('#organization_description').toggle();
+                    //         }
+                    //     })
+                    // })
+
+                    // institutions_ids.forEach(function(e){
+                    //     institutions_inputs.forEach(function(element){
+                    //         if(e != element.value) {
+                    //             // element.setAttribute('type', 'hidden');
+                    //             console.log(element.value);
+                    //             $('#chosen_organization').toggle();
+                    //             $('#checkbox_span').toggle();
+                    //             $('#description_span').toggle();
+                    //             $('#organization_name').toggle();
+                    //             $('#organization_description').toggle();
+                    //             // element.setAttribute('style', 'display: none')
+                    //             // checkbox_span.style.display = 'none';
+                    //             // description_span.style.display = 'none';
+                    //             // name_display.style.display = 'none';
+                    //             // description_display.style.display = 'none';
+                    //             // let div_name = element.nextElementSibling.nextElementSibling.firstChild
+                    //             // div_name.removeAttribute("style")
+                    //             // let div_description = element.nextElementSibling.nextElementSibling.firstChild.nextSibling
+                    //             // div_description.removeAttribute("style")
+                    //         } else {
+                    //             console.log(element.value);
+                    //         }
+                    //     })
+                    // })
+
+                    // for(let i = 0 ; i < institutions.length ; i++){
+                    //     let html = "<label><input type='radio' name='organization' className='multiple_institution_input' id='chosen_organization' value='' /><span className='checkbox radio'></span><span className='description'><div className='title' id='organization_name'></div><div className='subtitle' id='organization_description'></div></span></label>"
+                    //     institution.append(html)
+                    // }
+                },
+                error : function(xhr,errmsg,err) {
+                    alert(xhr.status + ": " + xhr.responseText);
+                },
+              });
+  })
 
   second_button.addEventListener('click', function () {
     let bags = $("input[name='bags']").val();
@@ -339,8 +435,6 @@ document.addEventListener("DOMContentLoaded", function() {
   })
   third_button.addEventListener('click', function () {
     let organization_pk = $("input[name='organization']:checked").val()
-    // let organization = $("input[name='organization']:checked").nextSibling.nextSibling.firstChild
-    // let organization = document.getElementById('organization_name')
     let inst_csrftoken = $("input[name='csrfmiddlewaretoken']").val();
               $.ajax({
                 url: '/charity_donation/add_donation/',
@@ -359,8 +453,6 @@ document.addEventListener("DOMContentLoaded", function() {
                     alert(xhr.status + ": " + xhr.responseText);
                 },
               });
-    // let given_organization = document.querySelector('#organization');
-    // given_organization.textContent = given_organization.textContent + organization
   })
   fourth_button.addEventListener('click', function () {
     let address = $("input[name='address']").val();

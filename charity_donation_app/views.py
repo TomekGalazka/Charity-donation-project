@@ -45,7 +45,7 @@ class AddDonationView(LoginRequiredMixin, View):
         institutions = Institution.objects.all()
         ctx = {
             'categories': categories,
-            'institutions': institutions
+            'institutions': institutions,
         }
 
         return render(request, 'charity_donation_app/form.html', ctx)
@@ -53,13 +53,32 @@ class AddDonationView(LoginRequiredMixin, View):
     def post(self, request, *args, **kwargs):
 
         if request.is_ajax():
-            organization_pk = request.POST['organization_pk']
-            organization_queryset = Institution.objects.filter(pk=organization_pk)
-            organization = ""
-            for item in organization_queryset:
-                organization += str(item)
-            org_response = {'organization': organization}
-            return JsonResponse(org_response)
+            if request.POST.get('organization_pk', None) is not None:
+                organization_pk = request.POST.get('organization_pk', None)
+                organization_queryset = Institution.objects.filter(pk=organization_pk)
+                organization = ""
+                for item in organization_queryset:
+                    organization += str(item)
+                org_response = {'organization': organization}
+                return JsonResponse(org_response)
+
+            if request.POST.get('selected_categories_id', None) is not None:
+                selected_categories_id = request.POST.get('selected_categories_id', None)
+                selected_institutions_list = []
+
+                for category_id in selected_categories_id:
+                    category = Institution.objects.filter(categories=int(category_id))
+                    for item in category:
+                        selected_institutions = []
+                        selected_institutions.append(item.pk)
+                        selected_institutions.append(item.name)
+                        selected_institutions.append(item.description)
+                        selected_institutions_list.append(selected_institutions)
+
+                response = {
+                    'institutions': selected_institutions_list,
+                }
+                return JsonResponse(response)
 
         form = DonationForm(request.POST)
         if form.is_valid():
