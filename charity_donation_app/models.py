@@ -6,6 +6,10 @@ User = get_user_model()
 
 
 class Category(models.Model):
+    """
+    Model represents a category that binds with different institutions. Different donations only apply to institutions
+    with certain categories.
+    """
     name = models.CharField(max_length=64)
 
     def __str__(self):
@@ -13,6 +17,9 @@ class Category(models.Model):
 
 
 class Institution(models.Model):
+    """
+    Model represents institution to which a donation can be made.
+    """
     FOUND = 'Trust'
     NON_GOV = 'Non-gov'
     LOCAL = 'Local'
@@ -32,6 +39,10 @@ class Institution(models.Model):
 
 
 class Donation(models.Model):
+    """
+    Model represents a donation that can be made to certain institution. Each donation needs to have a personalized
+    data.
+    """
     quantity = models.IntegerField()
     categories = models.ManyToManyField(Category)
     institution = models.ForeignKey(Institution, on_delete=models.CASCADE)

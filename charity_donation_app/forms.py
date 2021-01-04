@@ -21,6 +21,9 @@ from . models import Donation
 #         ]
 
 class DonationForm(forms.Form):
+    """
+    Logged user donation form. Used to validate data in View.
+    """
     quantity = forms.IntegerField()
     categories = forms.CharField()
     institution = forms.IntegerField()

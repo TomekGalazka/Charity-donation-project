@@ -38,6 +38,9 @@ class UserManager(UserManager):
 
 
 class User(AbstractUser):
+    """
+    Custom user model. Uses given email as USERNAME_FIELD.
+    """
     username = None
     email = models.EmailField(unique=True)
     # first_name = models.CharField(blank=True, max_length=30, verbose_name='first name')

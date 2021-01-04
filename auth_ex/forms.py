@@ -6,6 +6,9 @@ from .models import User
 
 
 class RegisterUserForm(forms.Form):
+    """
+    Form to register new user.
+    """
     first_name = forms.CharField(label='Imię')
     last_name = forms.CharField(label='Nazwisko')
     email = forms.EmailField(widget=forms.EmailInput, label='Email')
@@ -44,6 +47,9 @@ class RegisterUserForm(forms.Form):
 
 
 class LoginUserForm(forms.Form):
+    """
+    Form to log a user. Uses email as username field.
+    """
     email = forms.CharField(widget=forms.EmailInput(attrs={'placeholder': 'Email'}), label='Email')
     password = forms.CharField(widget=forms.PasswordInput(attrs={'placeholder': 'Hasło'}), label='Hasło')
 

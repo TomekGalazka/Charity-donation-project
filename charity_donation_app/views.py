@@ -1,7 +1,7 @@
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import JsonResponse
-from django.shortcuts import render, redirect
-from django.urls import reverse_lazy, reverse
+from django.shortcuts import render
+from django.urls import reverse_lazy
 from django.views import View
 
 from . forms import DonationForm
@@ -9,6 +9,9 @@ from . models import Donation, Institution, Category
 
 
 class LandingPageView(View):
+    """
+    Landing page. Displays available institutions and summarizes donated bags and institutions.
+    """
     def get(self, request, *args, **kwargs):
         all_donations = Donation.objects.all()
         quantity_counter = 0
@@ -38,6 +41,11 @@ class LandingPageView(View):
 
 
 class AddDonationView(LoginRequiredMixin, View):
+    """
+    View processes data send with AJAX request.
+        1. Returns institutions that only match certain categories (to display).
+        2. Saves a new donation in database.
+    """
     login_url = reverse_lazy('auth_ex:login')
 
     def get(self, request, *args, **kwargs):
@@ -123,13 +131,17 @@ class AddDonationView(LoginRequiredMixin, View):
 
 
 class FormConfirmationView(View):
-
+    """
+    User is redirected to this view after successful donation is made.
+    """
     def get(self, request, *args, **kwargs):
         return render(request, 'charity_donation_app/form-confirmation.html')
 
 
 class UserView(View):
-
+    """
+    View with user profile data. Display all donations made by logged in user.
+    """
     def get(self, request, *args, **kwargs):
         user = request.user
         user_donations = Donation.objects.filter(user=user)

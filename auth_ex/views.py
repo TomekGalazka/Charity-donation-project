@@ -9,6 +9,9 @@ from .models import User
 
 
 class RegisterView(FormView):
+    """
+    View allows to register new user.
+    """
     template_name = 'auth_ex/register.html'
     form_class = RegisterUserForm
     success_url = reverse_lazy('auth_ex:login')
@@ -24,10 +27,17 @@ class RegisterView(FormView):
 
 
 class LoginView(FormView):
+    """
+    View allows to log in existing user.
+    """
     template_name = 'auth_ex/login.html'
     form_class = LoginUserForm
 
     def form_valid(self, form):
+        """
+        Authenticates user. If user is authenticated redirects to landing page.
+        If not, redirects to register new user page.
+        """
         request = self.request
         user = authenticate(
             email=form.cleaned_data['email'],
@@ -44,6 +54,9 @@ class LoginView(FormView):
 
 
 class LogoutView(View):
+    """
+    Logs out current user. Redirects to main page.
+    """
     def get(self, request, *args, **kwargs):
         logout(request)
         return redirect(reverse_lazy('landing_page'))
