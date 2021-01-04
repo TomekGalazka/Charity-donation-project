@@ -14,7 +14,8 @@ import os
 
 try:
     from .secret_settings import *
-except ImportError: print("Error: make a local version of private_settings.py from the template")
+except ImportError:
+    raise ImportError("Error: make a local version of private_settings.py from the template")
 
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
